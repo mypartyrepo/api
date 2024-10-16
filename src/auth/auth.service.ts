@@ -3,7 +3,8 @@ import { SignupDto } from './dtos/signup.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/User.schema';
 import { Model } from 'mongoose';
-import { hash } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
+import { LoginDto } from './dtos/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -28,5 +29,21 @@ export class AuthService {
     });
 
     return credentials;
+  }
+
+  async login(credentials: LoginDto) {
+    const { username, email, password } = credentials;
+
+    let user: User;
+
+    if (username) user = await this.UserModel.findOne({ username });
+    else user = await this.UserModel.findOne({ email });
+
+    if (!user) throw new BadRequestException('Wrong credentials');
+
+    const passwordMatch = await compare(password, user.password);
+    if (!passwordMatch) throw new BadRequestException('Wrong credentials');
+
+    return { userId: user._id, ...credentials };
   }
 }

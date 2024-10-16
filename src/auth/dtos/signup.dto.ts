@@ -38,5 +38,6 @@ export class SignupDto {
   @Matches(specialCharRegex, {
     message: 'Password must contain at least one special character',
   })
+  @IsString()
   password: string;
 }
