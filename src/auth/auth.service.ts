@@ -5,6 +5,7 @@ import { User } from './schemas/User.schema';
 import { Model } from 'mongoose';
 import { compare, hash } from 'bcryptjs';
 import { LoginDto } from './dtos/login.dto';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,6 +44,28 @@ export class AuthService {
 
     const passwordMatch = await compare(password, user.password);
     if (!passwordMatch) throw new BadRequestException('Wrong credentials');
+
+    return { userId: user._id, ...credentials };
+  }
+
+  async changePassword(credentials: ChangePasswordDto) {
+    const { userId, username, email, password, newPassword } = credentials;
+
+    let user: User;
+
+    if (username) user = await this.UserModel.findOne({ username });
+    else if (email) user = await this.UserModel.findOne({ email });
+    else user = await this.UserModel.findById(userId);
+
+    if (!user) throw new BadRequestException('Wrong credentials');
+
+    const passwordMatch = await compare(password, user.password);
+    if (!passwordMatch) throw new BadRequestException('Wrong credentials');
+
+    const newHashedPassword = await hash(newPassword, 10);
+    user.password = newHashedPassword;
+
+    await user.save();
 
     return { userId: user._id, ...credentials };
   }
