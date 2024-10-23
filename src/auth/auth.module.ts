@@ -3,12 +3,17 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/User.schema';
+import { ResetToken, ResetTokenSchema } from './schemas/reset-token.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
         name: User.name,
         schema: UserSchema,
+      },
+      {
+        name: ResetToken.name,
+        schema: ResetTokenSchema,
       },
     ]),
   ],

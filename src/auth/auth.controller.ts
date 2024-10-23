@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,5 +22,10 @@ export class AuthController {
   @Put('change-password')
   changePassword(@Body() credentials: ChangePasswordDto) {
     return this.authService.changePassword(credentials);
+  }
+
+  @Post('forgot-password')
+  forgotPassword(@Body() credentials: ForgotPasswordDto) {
+    return this.authService.forgotPassword(credentials);
   }
 }
