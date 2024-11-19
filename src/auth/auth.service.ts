@@ -10,13 +10,19 @@ import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { nanoid } from 'nanoid';
 import { ResetToken } from './schemas/reset-token.schema';
 import { MailService } from 'src/services/mail.service';
+import { JwtService } from '@nestjs/jwt';
+import { RefreshToken } from './schemas/refresh-token.schema';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private UserModel: Model<User>,
+    @InjectModel(RefreshToken.name)
+    private RefreshTokenModel: Model<RefreshToken>,
     @InjectModel(ResetToken.name) private ResetTokenModel: Model<ResetToken>,
     private mailService: MailService,
+    private jwtService: JwtService,
   ) {}
 
   async signup(credentials: SignupDto) {
@@ -37,7 +43,9 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    return credentials;
+    const message = 'Cadastro realizado com sucesso!';
+
+    return { credentials, message };
   }
 
   async login(credentials: LoginDto) {
@@ -48,12 +56,12 @@ export class AuthService {
     if (username) user = await this.UserModel.findOne({ username });
     else user = await this.UserModel.findOne({ email });
 
-    if (!user) throw new BadRequestException('Wrong credentials');
+    if (!user) throw new BadRequestException('Credenciais incorretas');
 
     const passwordMatch = await compare(password, user.password);
-    if (!passwordMatch) throw new BadRequestException('Wrong credentials');
+    if (!passwordMatch) throw new BadRequestException('Credenciais incorretas');
 
-    return { userId: user._id, ...credentials };
+    return this.generateUserTokens(user._id);
   }
 
   async changePassword(credentials: ChangePasswordDto) {
@@ -103,5 +111,21 @@ export class AuthService {
     }
 
     return { message: 'Email sent' };
+  }
+
+  async generateUserTokens(userId) {
+    const accessToken = this.jwtService.sign({ userId }, { expiresIn: '1h' });
+    const refreshToken = uuidv4();
+
+    await this.storeRefreshToken(refreshToken, userId);
+
+    return { accessToken, refreshToken };
+  }
+
+  async storeRefreshToken(token: string, userId: string) {
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 3);
+
+    await this.RefreshTokenModel.create({ token, userId, expiryDate });
   }
 }
