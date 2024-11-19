@@ -33,10 +33,10 @@ export class AuthService {
     const { name, username, email, password } = credentials;
 
     const usernameInUse = await this.UserModel.findOne({ username });
-    if (usernameInUse) throw new BadRequestException('Username already in use');
+    if (usernameInUse) throw new BadRequestException('Username já em uso');
 
     const emailInUse = await this.UserModel.findOne({ email });
-    if (emailInUse) throw new BadRequestException('Email already in use');
+    if (emailInUse) throw new BadRequestException('Email já em uso');
 
     const hashedPassword = await hash(password, 10);
 
@@ -65,13 +65,13 @@ export class AuthService {
     const passwordMatch = await compare(password, user.password);
     if (!passwordMatch) throw new BadRequestException('Credenciais incorretas');
 
-    const tokens = this.generateUserTokens(user._id);
+    const tokens = await this.generateUserTokens(user._id);
 
     return { ...tokens, userId: user._id };
   }
 
   async refreshTokens(refreshToken: string) {
-    const token = await this.RefreshTokenModel.findOneAndDelete({
+    const token = await this.RefreshTokenModel.findOne({
       token: refreshToken,
       expiryDate: { $gte: new Date() },
     });
@@ -144,6 +144,10 @@ export class AuthService {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 3);
 
-    await this.RefreshTokenModel.create({ token, userId, expiryDate });
+    await this.RefreshTokenModel.updateOne(
+      { userId },
+      { $set: { expiryDate, token } },
+      { upsert: true },
+    );
   }
 }
