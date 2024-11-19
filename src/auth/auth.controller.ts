@@ -4,6 +4,7 @@ import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
+import { RefreshTokenDto } from './dtos/refresh-tokens.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,6 +18,11 @@ export class AuthController {
   @Post('login')
   login(@Body() credentials: LoginDto) {
     return this.authService.login(credentials);
+  }
+
+  @Post('refresh')
+  refresh(@Body() credentials: RefreshTokenDto) {
+    return this.authService.refreshTokens(credentials.refreshToken);
   }
 
   @Put('change-password')

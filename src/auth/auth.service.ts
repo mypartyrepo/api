@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SignupDto } from './dtos/signup.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/User.schema';
@@ -61,7 +65,21 @@ export class AuthService {
     const passwordMatch = await compare(password, user.password);
     if (!passwordMatch) throw new BadRequestException('Credenciais incorretas');
 
-    return this.generateUserTokens(user._id);
+    const tokens = this.generateUserTokens(user._id);
+
+    return { ...tokens, userId: user._id };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    const token = await this.RefreshTokenModel.findOneAndDelete({
+      token: refreshToken,
+      expiryDate: { $gte: new Date() },
+    });
+
+    if (!token) {
+      throw new UnauthorizedException('Refresh Token is invalid');
+    }
+    return this.generateUserTokens(token.userId);
   }
 
   async changePassword(credentials: ChangePasswordDto) {
