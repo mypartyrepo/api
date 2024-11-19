@@ -1,10 +1,11 @@
-import { Body, Controller, Post, Put } from '@nestjs/common';
+import { Body, Controller, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { RefreshTokenDto } from './dtos/refresh-tokens.dto';
+import { AuthenticationGuard } from 'src/guards/authentication.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -25,9 +26,17 @@ export class AuthController {
     return this.authService.refreshTokens(credentials.refreshToken);
   }
 
+  @UseGuards(AuthenticationGuard)
   @Put('change-password')
-  changePassword(@Body() credentials: ChangePasswordDto) {
-    return this.authService.changePassword(credentials);
+  async changePassword(
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Req() req,
+  ) {
+    return this.authService.changePassword(
+      req.userId,
+      changePasswordDto.oldPassword,
+      changePasswordDto.newPassword,
+    );
   }
 
   @Post('forgot-password')

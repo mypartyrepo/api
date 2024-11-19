@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { SignupDto } from './dtos/signup.dto';
@@ -9,7 +10,6 @@ import { User } from './schemas/User.schema';
 import { Model } from 'mongoose';
 import { compare, hash } from 'bcryptjs';
 import { LoginDto } from './dtos/login.dto';
-import { ChangePasswordDto } from './dtos/change-password.dto';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { nanoid } from 'nanoid';
 import { ResetToken } from './schemas/reset-token.schema';
@@ -82,26 +82,20 @@ export class AuthService {
     return this.generateUserTokens(token.userId);
   }
 
-  async changePassword(credentials: ChangePasswordDto) {
-    const { userId, username, email, password, newPassword } = credentials;
+  async changePassword(userId, oldPassword: string, newPassword: string) {
+    const user = await this.UserModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
 
-    let user: User;
-
-    if (username) user = await this.UserModel.findOne({ username });
-    else if (email) user = await this.UserModel.findOne({ email });
-    else user = await this.UserModel.findById(userId);
-
-    if (!user) throw new BadRequestException('Wrong credentials');
-
-    const passwordMatch = await compare(password, user.password);
-    if (!passwordMatch) throw new BadRequestException('Wrong credentials');
+    const passwordMatch = await compare(oldPassword, user.password);
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Credenciais incorretas');
+    }
 
     const newHashedPassword = await hash(newPassword, 10);
     user.password = newHashedPassword;
-
     await user.save();
-
-    return { userId: user._id, ...credentials };
   }
 
   async forgotPassword(credentials: ForgotPasswordDto) {
