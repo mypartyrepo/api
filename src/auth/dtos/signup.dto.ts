@@ -8,6 +8,7 @@ import {
 import {
   lowercaseRegex,
   numberRegex,
+  phoneRegex,
   specialCharRegex,
   uppercaseRegex,
 } from 'src/utils/regex';
@@ -17,26 +18,29 @@ export class SignupDto {
   name: string;
 
   @IsString()
-  @MaxLength(9, { message: 'Username must contain 9 characters maximum' })
-  @MinLength(6, { message: 'Username must contain 6 characters minimum' })
+  @MaxLength(10, { message: 'O username deve conter no máximo 10 caracteres' })
+  @MinLength(6, { message: 'O username deve conter no mínimo 6 caracteres' })
   username: string;
 
-  @IsEmail()
+  @Matches(phoneRegex, { message: 'Celular deve ser válido' })
+  phone: string;
+
+  @IsEmail({}, { message: 'Email deve ser um email' })
   email: string;
 
-  @MaxLength(16, { message: 'Password must contain 16 characters maximum' })
-  @MinLength(8, { message: 'Password must contain 8 characters minimum' })
+  @MaxLength(16, { message: 'A senha deve conter no máximo 16 caracteres' })
+  @MinLength(8, { message: 'A senha deve conter no mínimo 8 caracteres' })
   @Matches(uppercaseRegex, {
-    message: 'Password must contain at least one uppercase letter',
+    message: 'A senha deve conter no mínimo 1 letra maiúscula',
   })
   @Matches(lowercaseRegex, {
-    message: 'Password must contain at least one lowercase letter',
+    message: 'A senha deve conter no mínimo 1 letra minúscula',
   })
   @Matches(numberRegex, {
-    message: 'Password must contain at least one number',
+    message: 'A senha deve conter no mínimo 1 número',
   })
   @Matches(specialCharRegex, {
-    message: 'Password must contain at least one special character',
+    message: 'A senha deve conter no mínimo 1 caracter especial',
   })
   @IsString()
   password: string;
