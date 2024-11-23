@@ -1,4 +1,13 @@
-import { Body, Controller, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
@@ -42,5 +51,11 @@ export class AuthController {
   @Post('forgot-password')
   forgotPassword(@Body() credentials: ForgotPasswordDto) {
     return this.authService.forgotPassword(credentials);
+  }
+
+  @UseGuards(AuthenticationGuard)
+  @Get('user/:id')
+  async findOne(@Param('id') id: string) {
+    return await this.authService.findUser(id);
   }
 }

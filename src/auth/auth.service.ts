@@ -71,6 +71,17 @@ export class AuthService {
     return { ...tokens, userId: user._id };
   }
 
+  async findUser(id: string) {
+    const user = await this.UserModel.findById(id);
+
+    const plainUser = user.toObject();
+    const newUser = Object.fromEntries(
+      Object.entries(plainUser).filter(([key]) => key !== 'password'),
+    );
+
+    return newUser;
+  }
+
   async refreshTokens(refreshToken: string) {
     const token = await this.RefreshTokenModel.findOne({
       token: refreshToken,
