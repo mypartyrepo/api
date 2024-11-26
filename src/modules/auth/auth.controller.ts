@@ -14,7 +14,7 @@ import { LoginDto } from './dtos/login.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { RefreshTokenDto } from './dtos/refresh-tokens.dto';
-import { AuthenticationGuard } from 'src/guards/authentication.guard';
+import { AuthenticationGuard } from 'src/modules/auth/guards/authentication.guard';
 
 @Controller('auth')
 export class AuthController {

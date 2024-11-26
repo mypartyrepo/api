@@ -46,11 +46,12 @@ export class AuthService {
       phone,
       email,
       password: hashedPassword,
+      subscription: false,
     });
 
     const message = 'Cadastro realizado com sucesso!';
 
-    return { userName: name, message };
+    return { message };
   }
 
   async login(credentials: LoginDto) {
@@ -68,7 +69,7 @@ export class AuthService {
 
     const tokens = await this.generateUserTokens(user._id);
 
-    return { ...tokens, userId: user._id };
+    return { ...tokens, userId: user._id, name: user.name };
   }
 
   async findUser(id: string) {

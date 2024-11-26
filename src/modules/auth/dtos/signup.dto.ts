@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEmail,
   IsString,
   Matches,
@@ -44,4 +45,7 @@ export class SignupDto {
   })
   @IsString()
   password: string;
+
+  @IsBoolean()
+  subscription: boolean;
 }
