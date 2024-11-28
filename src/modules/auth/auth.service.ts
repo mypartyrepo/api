@@ -132,7 +132,7 @@ export class AuthService {
         expiryDate,
       });
 
-      this.mailService.sendPasswordResetEmail(user.email, resetToken);
+      //this.mailService.sendPasswordResetEmail(user.email, resetToken);
     }
 
     return { message: 'Email sent' };
