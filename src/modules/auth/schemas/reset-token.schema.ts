@@ -5,12 +5,10 @@ import mongoose, { Document } from 'mongoose';
 export class ResetToken extends Document {
   @Prop({ required: true })
   token: string;
-
   @Prop({ required: true, type: mongoose.Types.ObjectId })
   userId: mongoose.Types.ObjectId;
-
   @Prop({ required: true })
-  expiryDate: string;
+  expiryDate: Date;
 }
 
 export const ResetTokenSchema = SchemaFactory.createForClass(ResetToken);

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import { MailService } from 'src/services/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshToken } from './schemas/refresh-token.schema';
 import { v4 as uuidv4 } from 'uuid';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -132,10 +134,45 @@ export class AuthService {
         expiryDate,
       });
 
-      //this.mailService.sendPasswordResetEmail(user.email, resetToken);
+      this.mailService.sendPasswordResetEmail(
+        'leleusous4@gmail.com',
+        resetToken,
+      );
+
+      return { message: 'Um link de validação foi enviado para o seu email!' };
+    }
+  }
+
+  async resetPassword({ newPassword, resetToken }: ResetPasswordDto) {
+    console.log(resetToken);
+    const token = await this.ResetTokenModel.findOne({
+      token: resetToken,
+      expiryDate: { $gte: new Date() },
+    });
+
+    if (!token) {
+      throw new UnauthorizedException('Invalid link');
     }
 
-    return { message: 'Email sent' };
+    const user = await this.UserModel.findById(token.userId);
+    if (!user) {
+      throw new InternalServerErrorException('Usuário não encontrado.');
+    }
+
+    const passwordMatch = await compare(newPassword, user.password);
+    if (passwordMatch) {
+      throw new BadRequestException('As senhas devem ser diferentes.');
+    }
+
+    user.password = await hash(newPassword, 10);
+    await user.save();
+
+    await this.ResetTokenModel.findOneAndDelete({
+      token: resetToken,
+      expiryDate: { $gte: new Date() },
+    });
+
+    return { message: 'Senha alterada com sucesso!' };
   }
 
   async generateUserTokens(userId) {

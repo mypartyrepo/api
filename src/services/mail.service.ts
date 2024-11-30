@@ -8,22 +8,23 @@ export class MailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
-        user: '',
-        pass: '',
+        user: 'leleosous4@gmail.com',
+        pass: 'aqli zhqg pobj nqdc',
       },
     });
   }
 
   async sendPasswordResetEmail(recipient: string, token: string) {
-    const resetLink = `http://yourapp.com/reset-password?token=${token}`;
+    const resetLink = `http://myparty.com/reset-password?token=${token}`;
     const mailOptions = {
-      from: 'Auth-backend service',
+      from: 'MyParty',
       to: recipient,
-      subject: 'Password Reset Request',
-      html: `<p>You requested a password reset. Click the link below to reset your password:</p><p><a href="${resetLink}">Reset Password</a></p>`,
+      subject: 'Recuperação de senha',
+      html: `<p>Seu link de recuperação de senha é ${resetLink}</p>`,
     };
 
     await this.transporter.sendMail(mailOptions);

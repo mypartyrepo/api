@@ -10,4 +10,7 @@ export default () => ({
     authToken: process.env.TWILIO_AUTH_TOKEN,
     phoneNumber: process.env.TWILIO_PHONE_NUMBER,
   },
+  gmail: {
+    password: process.env.GMAIL_PASSWORD,
+  },
 });
