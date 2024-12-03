@@ -32,7 +32,7 @@ export class AuthService {
   ) {}
 
   async signup(credentials: SignupDto) {
-    const { name, username, email, password, phone } = credentials;
+    const { username, email, password } = credentials;
 
     const usernameInUse = await this.UserModel.findOne({ username });
     if (usernameInUse) throw new BadRequestException('Username já em uso');
@@ -43,17 +43,12 @@ export class AuthService {
     const hashedPassword = await hash(password, 10);
 
     await this.UserModel.create({
-      name,
-      username,
-      phone,
-      email,
+      ...credentials,
       password: hashedPassword,
       subscription: false,
     });
 
-    const message = 'Cadastro realizado com sucesso!';
-
-    return { message };
+    return { message: 'Cadastro realizado com sucesso!' };
   }
 
   async login(credentials: LoginDto) {
