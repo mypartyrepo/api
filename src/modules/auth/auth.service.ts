@@ -19,6 +19,7 @@ import { JwtService } from '@nestjs/jwt';
 import { RefreshToken } from './schemas/refresh-token.schema';
 import { v4 as uuidv4 } from 'uuid';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -78,6 +79,21 @@ export class AuthService {
     );
 
     return newUser;
+  }
+
+  async updateUser(user: UpdateUserDto) {
+    if (user.username) {
+      const usernameInUse = await this.UserModel.findOne({
+        username: user.username,
+      });
+
+      if (usernameInUse && usernameInUse.id !== user.id)
+        throw new UnauthorizedException('Username indisponível.');
+    }
+
+    await this.UserModel.findByIdAndUpdate(user.id, user);
+
+    return { message: 'Usuário atualizado com sucesso!' };
   }
 
   async refreshTokens(refreshToken: string) {

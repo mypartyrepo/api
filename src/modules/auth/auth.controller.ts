@@ -16,6 +16,7 @@ import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { RefreshTokenDto } from './dtos/refresh-tokens.dto';
 import { AuthenticationGuard } from 'src/modules/auth/guards/authentication.guard';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -61,7 +62,13 @@ export class AuthController {
 
   @UseGuards(AuthenticationGuard)
   @Get('user/:id')
-  async findOne(@Param('id') id: string) {
+  async findUser(@Param('id') id: string) {
     return await this.authService.findUser(id);
+  }
+
+  //@UseGuards(AuthenticationGuard)
+  @Put('user')
+  async updateUser(@Body() user: UpdateUserDto) {
+    return await this.authService.updateUser(user);
   }
 }
