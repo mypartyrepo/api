@@ -7,15 +7,13 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { dateTime, GuestAt, OwnEvents } from 'src/types/user';
 import { phoneRegex } from 'src/utils/regex';
 
 export class UpdateUserDto {
-  @IsString()
-  id: string;
-
   @IsOptional()
   @IsString()
-  name: string;
+  fullName: string;
 
   @IsOptional()
   @IsString()
@@ -34,4 +32,16 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   subscription: boolean;
+
+  @IsOptional()
+  guestAt: GuestAt[];
+
+  @IsOptional()
+  ownEvents: OwnEvents[];
+
+  @IsOptional()
+  createdAt: dateTime;
+
+  @IsOptional()
+  updatedAt: dateTime;
 }

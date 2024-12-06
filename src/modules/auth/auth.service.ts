@@ -67,7 +67,7 @@ export class AuthService {
 
     const tokens = await this.generateUserTokens(user._id);
 
-    return { ...tokens, userId: user._id, name: user.name };
+    return { ...tokens, userId: user._id, fullName: user.fullName };
   }
 
   async findUser(id: string) {
@@ -81,17 +81,23 @@ export class AuthService {
     return newUser;
   }
 
-  async updateUser(user: UpdateUserDto) {
+  async updateUser(id: string, user: UpdateUserDto) {
+    if (!id) throw new UnauthorizedException('Id inválido!');
+
+    const dbUser = await this.UserModel.findById(id);
     if (user.username) {
       const usernameInUse = await this.UserModel.findOne({
         username: user.username,
       });
 
-      if (usernameInUse && usernameInUse.id !== user.id)
+      if (usernameInUse)
         throw new UnauthorizedException('Username indisponível.');
     }
 
-    await this.UserModel.findByIdAndUpdate(user.id, user);
+    await this.UserModel.findByIdAndUpdate(id, {
+      ...dbUser.toObject(),
+      ...user,
+    });
 
     return { message: 'Usuário atualizado com sucesso!' };
   }
@@ -122,6 +128,8 @@ export class AuthService {
     const newHashedPassword = await hash(newPassword, 10);
     user.password = newHashedPassword;
     await user.save();
+
+    return { message: 'Senha alterada com sucesso!' };
   }
 
   async forgotPassword(credentials: ForgotPasswordDto) {

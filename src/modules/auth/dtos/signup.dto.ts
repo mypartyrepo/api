@@ -16,7 +16,7 @@ import {
 
 export class SignupDto {
   @IsString()
-  name: string;
+  fullName: string;
 
   @IsString()
   @MaxLength(10, { message: 'O username deve conter no máximo 10 caracteres' })

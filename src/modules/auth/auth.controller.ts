@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Post,
   Put,
   Req,
@@ -61,14 +60,14 @@ export class AuthController {
   }
 
   @UseGuards(AuthenticationGuard)
-  @Get('user/:id')
-  async findUser(@Param('id') id: string) {
-    return await this.authService.findUser(id);
+  @Get('user')
+  async findUser(@Req() req) {
+    return await this.authService.findUser(req.userId);
   }
 
-  //@UseGuards(AuthenticationGuard)
+  @UseGuards(AuthenticationGuard)
   @Put('user')
-  async updateUser(@Body() user: UpdateUserDto) {
-    return await this.authService.updateUser(user);
+  async updateUser(@Body() user: UpdateUserDto, @Req() req) {
+    return await this.authService.updateUser(req.userId, user);
   }
 }
