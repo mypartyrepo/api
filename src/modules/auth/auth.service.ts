@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { SignupDto } from './dtos/signup.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './schemas/User.schema';
+import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { compare, hash } from 'bcryptjs';
 import { LoginDto } from './dtos/login.dto';
