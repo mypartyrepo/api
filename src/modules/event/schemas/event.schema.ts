@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { EventScreen, Guest } from '../types/event';
+import { EventAddress, EventScreen, Guest } from '../types/event';
 
 @Schema({ versionKey: false, timestamps: true })
 export class Event extends Document {
@@ -19,28 +19,13 @@ export class Event extends Document {
   @Prop({ required: true })
   time: string;
 
-  @Prop({ required: true })
-  cep: string;
+  @Prop({ required: true, type: Object })
+  address: EventAddress;
 
-  @Prop({ required: true })
-  state: string;
-
-  @Prop({ required: true })
-  city: string;
-
-  @Prop({ required: true })
-  neighborhood: string;
-
-  @Prop({ required: true })
-  street: string;
-
-  @Prop({ required: true })
-  addressNumber: string;
-
-  @Prop()
+  @Prop({ type: [Object], default: [] })
   guests: Guest[];
 
-  @Prop()
+  @Prop({ type: [Object], default: [] })
   screens: EventScreen[];
 }
 

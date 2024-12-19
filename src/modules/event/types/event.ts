@@ -4,8 +4,7 @@ export type EventType = [
     name: string;
     description: string;
     dateString: Date;
-    CEP: string;
-    address: string;
+    address: EventAddress;
     guests?: Guest[];
     screens?: EventScreen[];
   },
@@ -136,4 +135,13 @@ type SocialMediaField = {
   ];
   index: number;
   type: 'social-media';
+};
+
+export type EventAddress = {
+  cep: string;
+  state: string;
+  city: string;
+  neighborhood: string;
+  street: string;
+  addressNumber: string;
 };

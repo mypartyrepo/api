@@ -1,5 +1,5 @@
-import { IsOptional, IsString, MaxLength } from 'class-validator';
-import { EventScreen, Guest } from '../types/event';
+import { IsObject, IsOptional, IsString } from 'class-validator';
+import { EventAddress, EventScreen, Guest } from '../types/event';
 
 export class EventDto {
   @IsString()
@@ -14,24 +14,8 @@ export class EventDto {
   @IsString()
   time: string;
 
-  @IsString()
-  @MaxLength(8, { message: 'O CEP deve conter no máximo 8 caracteres.' })
-  cep: string;
-
-  @IsString()
-  state: string;
-
-  @IsString()
-  city: string;
-
-  @IsString()
-  neighborhood: string;
-
-  @IsString()
-  street: string;
-
-  @IsString()
-  addressNumber: string;
+  @IsObject()
+  address: EventAddress;
 
   @IsOptional()
   guests: Guest[];
