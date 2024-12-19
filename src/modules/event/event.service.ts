@@ -18,9 +18,7 @@ export class EventService {
     @InjectModel(User.name) private UserModel: Model<User>,
   ) {}
 
-  async createEvent(event: EventDto) {
-    const { userId } = event;
-
+  async createEvent(userId: string, event: EventDto) {
     const user = await this.UserModel.findById(userId);
     if (!user) throw new BadRequestException('Usuário não encontrado.');
     if (!user.subscription)
@@ -34,13 +32,20 @@ export class EventService {
         'Limite de eventos por usuário atingido.',
       );
 
-    await this.EventModel.create({ ...event });
+    const createdEvent = await this.EventModel.create({ userId, ...event });
 
-    return { message: 'Evento criado com sucesso!' };
+    return { message: 'Evento criado com sucesso!', event: createdEvent };
   }
 
-  async updateEvent(event: UpdateEventDto) {
-    const { userId, _id } = event;
+  async findEvent(eventId: string) {
+    const event = await this.EventModel.findById(eventId);
+    if (!event) throw new BadRequestException('Evento não encontrado.');
+
+    return { message: 'Evento encontrado com sucesso!', event };
+  }
+
+  async updateEvent(userId: string, event: UpdateEventDto) {
+    const { _id } = event;
 
     const user = await this.UserModel.findById(userId);
     if (!user) throw new BadRequestException('Usuário não encontrado.');

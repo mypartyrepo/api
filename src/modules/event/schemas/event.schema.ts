@@ -14,13 +14,28 @@ export class Event extends Document {
   description: string;
 
   @Prop({ required: true })
-  dateString: Date;
+  date: string;
 
   @Prop({ required: true })
-  CEP: string;
+  time: string;
 
   @Prop({ required: true })
-  address: string;
+  cep: string;
+
+  @Prop({ required: true })
+  state: string;
+
+  @Prop({ required: true })
+  city: string;
+
+  @Prop({ required: true })
+  neighborhood: string;
+
+  @Prop({ required: true })
+  street: string;
+
+  @Prop({ required: true })
+  addressNumber: string;
 
   @Prop()
   guests: Guest[];
