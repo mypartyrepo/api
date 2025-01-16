@@ -3,8 +3,10 @@ import {
   Controller,
   Get,
   Param,
+  ParseArrayPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -17,6 +19,14 @@ import { AuthenticationGuard } from '../auth/guards/authentication.guard';
 @Controller('event')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
+
+  @Get('events')
+  async findEvents(
+    @Query('eventIds', new ParseArrayPipe({ items: String, separator: ',' }))
+    eventIds: string[],
+  ) {
+    return await this.eventService.findEvents(eventIds);
+  }
 
   @Get(':id')
   async findEvent(@Param('id') eventId) {

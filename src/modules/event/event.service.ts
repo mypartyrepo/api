@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Event } from './schemas/event.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User } from '../auth/schemas/user.schema';
 import { EventDto } from './dtos/event.dto';
 import { UpdateEventDto } from './dtos/update-event.dto';
@@ -42,6 +42,27 @@ export class EventService {
     if (!event) throw new BadRequestException('Evento não encontrado.');
 
     return { message: 'Evento encontrado com sucesso!', event };
+  }
+
+  async findEvents(eventIds: string[]) {
+    const objectIds = eventIds
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+
+    const events = await this.EventModel.find({ _id: { $in: objectIds } });
+
+    if (events.length === 0) {
+      throw new BadRequestException('Nenhum evento encontrado.');
+    }
+
+    const foundIds = events.map((event) => event._id.toString());
+    const notFoundIds = eventIds.filter((id) => !foundIds.includes(id));
+
+    return {
+      message: 'Eventos encontrados com sucesso!',
+      foundEvents: events,
+      notFoundIds: notFoundIds.length > 0 ? notFoundIds : null,
+    };
   }
 
   async updateEvent(userId: string, event: UpdateEventDto) {
